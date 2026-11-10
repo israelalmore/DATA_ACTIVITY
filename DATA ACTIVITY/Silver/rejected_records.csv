@@ -1,0 +1,26 @@
+_source_file,_source_line,reason,raw_record
+clientes.json,109,cliente de test/debug,"{""id_cliente"":200,""nombre"":""TestUser"",""pais"":""??""}"
+clientes.json,111,cliente de test/debug,"{""id_cliente"":201,""nombre"":""Debug"",""pais"":""ES""}"
+ventas.csv,6,cliente inexistente,"5,999,monitor,150"
+ventas.csv,7,importe negativo o cero,"6,104,raton,-10"
+ventas.csv,8,importe no numérico,"7,105,teclado,abc"
+ventas.csv,16,id_cliente vacío o inválido,"15,,raton,20"
+ventas.csv,30,cliente de test/debug,"29,200,test,0"
+ventas.csv,31,cliente de test/debug,"30,201,monitor,9999"
+ventas.csv,116,cliente de test/debug,"107,200,teclado,30"
+ventas.csv,117,cliente de test/debug,"108,201,raton,20"
+ventas.csv,34,posible duplicado del pedido 31,"32,101,teclado,30"
+logs.txt,4,cliente inexistente,[ERROR] user=999 action=login
+logs.txt,15,user no numérico,[ERROR] user=abc action=login
+logs.txt,22,sin user,[INFO] action=compra
+logs.txt,23,action vacía,[INFO] user=120 action=
+logs.txt,25,evento de test/debug,[DEBUG] user=122 action=test
+logs.txt,27,cliente inexistente,[ERROR] user=999 action=compra
+logs.txt,104,cliente de test/debug,[INFO] user=200 action=login
+logs.txt,105,evento de test/debug,[DEBUG] user=201 action=test
+logs.txt,106,evento de test/debug,[DEBUG] user=202 action=test
+logs.txt,107,evento de test/debug,[DEBUG] user=203 action=test
+logs.txt,117,action vacía,[INFO] user=213 action=
+logs.txt,124,user no numérico,[ERROR] user=xyz action=compra
+logs.txt,155,línea vacía,
+logs.txt,186,línea vacía,
