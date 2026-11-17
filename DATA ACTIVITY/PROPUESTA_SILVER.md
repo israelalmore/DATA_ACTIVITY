@@ -12,7 +12,7 @@ Qué datos de `Bronze/` subirían a `Silver/`, con qué transformaciones y qué 
 |---|---|---|---|---|
 | `clientes` | 250 | **248** | 2 | 5 |
 | `ventas` | 200 | **191** | 9 | 0 |
-| `logs` | 207 líneas | **193** | 14 | 0 (se estructuran) |
+| `logs` | 207 líneas | **1 93** | 14 | 0 (se estructuran) |
 
 ---
 

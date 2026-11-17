@@ -21,10 +21,17 @@ python scripts/bronze_to_silver.py Bronze Silver
 
 ## 2. Ficheros generados
 
+**En `Silver/`** (solo estos dos datasets):
+
 | Fichero | Contenido | Filas | Origen |
 |---|---|---|---|
 | `clean_customers.csv` | Maestro de clientes | **248** | `clientes.json` (250) |
 | `clean_sales.csv` | Pedidos | **191** | `ventas.csv` (200) |
+
+**En `Analisis/`** (no forman parte de Silver; material de apoyo para el análisis y la presentación):
+
+| Fichero | Contenido | Filas | Origen |
+|---|---|---|---|
 | `clean_logs.csv` | Eventos de actividad | **193** | `logs.txt` (207 líneas) |
 | `rejected_records.csv` | Cuarentena: lo que no sube, con el motivo | **25** | Los tres |
 
