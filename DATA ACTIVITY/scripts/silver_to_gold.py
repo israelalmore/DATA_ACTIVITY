@@ -291,11 +291,44 @@ Todos los clientes del maestro, incluidos los {no_buyers} sin compra (importe 0)
 """
 
 
+def export_csv(con, gold):
+    """Exporta las tablas analíticas finales a ficheros CSV para consumo de BI/OLAP."""
+    gold.mkdir(parents=True, exist_ok=True)
+    
+    # 1. Tabla final requerida por el enunciado: Sales by customer
+    cursor_cust = con.execute("""
+        SELECT customer_id, 
+               COALESCE(customer_name, '(sin nombre)') AS customer_name, 
+               country_code, 
+               orders, 
+               total_sales, 
+               revenue_share, 
+               sales_rank 
+        FROM gold_sales_by_customer 
+        ORDER BY sales_rank, customer_id
+    """)
+    cols = [d[0] for d in cursor_cust.description]
+    with (gold / "sales_by_customer.csv").open("w", encoding="utf-8", newline="") as fh:
+        writer = csv.writer(fh, lineterminator="\n")
+        writer.writerow(cols)
+        writer.writerows(cursor_cust.fetchall())
+        
+    # 2. Indicadores globales y Total Revenue
+    cursor_kpi = con.execute("SELECT * FROM gold_kpis")
+    kpi_cols = [d[0] for d in cursor_kpi.description]
+    with (gold / "kpis.csv").open("w", encoding="utf-8", newline="") as fh:
+        writer = csv.writer(fh, lineterminator="\n")
+        writer.writerow(kpi_cols)
+        writer.writerows(cursor_kpi.fetchall())
+    print(f"Datasets CSV generados en {gold}: sales_by_customer.csv, kpis.csv")
+
+
 def main(silver, gold):
     silver, gold = Path(silver), Path(gold)
     con = build(silver)
     try:
         content = render(con)
+        export_csv(con, gold)
     finally:
         con.close()
     gold.mkdir(parents=True, exist_ok=True)
