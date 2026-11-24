@@ -1,6 +1,6 @@
 # Capa Gold
 
-> Generado automáticamente por `scripts/silver_to_gold.py` a partir de `Silver/` el 2026-11-17T18:07:25Z (UTC). **No editar a mano.**
+> Generado automáticamente por `scripts/silver_to_gold.py` a partir de `Silver/` el 2026-11-24T17:43:34Z (UTC). **No editar a mano.**
 > Importes sin símbolo: moneda sin confirmar. Datos sin validar como datos de negocio (ver `ANALISIS_SILVER.md`, S7).
 > Criterios y decisiones: [`PROPUESTA_GOLD.md`](../PROPUESTA_GOLD.md).
 

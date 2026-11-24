@@ -1,14 +1,12 @@
 """Bronze -> Silver: limpia y normaliza clientes, ventas y logs.
 
 Uso:
-    python bronze_to_silver.py <dir_bronze> <dir_silver> [<dir_analisis>]
+    python bronze_to_silver.py <dir_bronze> <dir_silver>
 
 Genera en <dir_silver>:
     clean_customers.csv, clean_sales.csv
-Genera en <dir_analisis> (por defecto ../Analisis respecto a <dir_silver>):
-    clean_logs.csv, rejected_records.csv  (no forman parte de Silver; apoyo al análisis)
 
-Criterios: ver ../PROPUESTA_SILVER.md. Solo usa la biblioteca estándar.
+Solo usa la biblioteca estándar.
 """
 
 import csv
@@ -210,11 +208,9 @@ def write_csv(path, rows, fields):
             writer.writerow({k: ("" if row[k] is None else row[k]) for k in fields})
 
 
-def main(bronze, silver, analysis=None):
+def main(bronze, silver):
     bronze, silver = Path(bronze), Path(silver)
-    analysis = Path(analysis) if analysis else silver.parent / "Analisis"
     silver.mkdir(parents=True, exist_ok=True)
-    analysis.mkdir(parents=True, exist_ok=True)
     rejects = Rejects()
 
     customers, test_ids = clean_customers(bronze / "clientes.json", rejects)
@@ -226,13 +222,11 @@ def main(bronze, silver, analysis=None):
     lin = ["_source_file", "_source_line", "_load_ts"]
     write_csv(silver / "clean_customers.csv", customers, ["customer_id", "customer_name", "country_code", *lin])
     write_csv(silver / "clean_sales.csv", sales, ["order_id", "customer_id", "product", "amount", *lin])
-    write_csv(analysis / "clean_logs.csv", logs, ["log_level", "customer_id", "action", *lin])
-    write_csv(analysis / "rejected_records.csv", rejects.rows, ["_source_file", "_source_line", "reason", "raw_record"])
 
     print(f"customers={len(customers)} sales={len(sales)} logs={len(logs)} rejected={len(rejects.rows)}")
 
 
 if __name__ == "__main__":
-    if len(sys.argv) not in (3, 4):
+    if len(sys.argv) != 3:
         sys.exit(__doc__)
     main(*sys.argv[1:])

@@ -3,12 +3,12 @@
 Uso:
     python silver_to_gold.py <dir_silver> <dir_gold>
 
-Genera un único fichero, <dir_gold>/GOLD.md, con estas tablas:
-    KPIs, ventas por cliente, por producto y por país, y respuestas de negocio.
+Genera <dir_gold>/GOLD.md y los CSV solicitados:
+    sales_by_customer.csv, sales_by_product.csv y sales_by_country.csv.
 
 Lee solo Silver (clean_customers.csv, clean_sales.csv). Los cálculos se hacen en una
-base SQLite en memoria que no se guarda. Criterios: ver ../PROPUESTA_GOLD.md.
-Idempotente: cada ejecución reescribe GOLD.md entero. Solo usa la biblioteca estándar.
+base SQLite en memoria que no se guarda.
+Idempotente: cada ejecución reescribe GOLD.md y los tres CSV. Solo usa la biblioteca estándar.
 """
 
 import csv
@@ -260,14 +260,13 @@ def render(con):
     return f"""# Capa Gold
 
 > Generado automáticamente por `scripts/silver_to_gold.py` a partir de `Silver/` el {LOAD_TS} (UTC). **No editar a mano.**
-> Importes sin símbolo: moneda sin confirmar. Datos sin validar como datos de negocio (ver `ANALISIS_SILVER.md`, S7).
-> Criterios y decisiones: [`PROPUESTA_GOLD.md`](../PROPUESTA_GOLD.md).
+> Importes sin símbolo: moneda sin confirmar; los datos no están validados como datos de negocio.
 
 ## 1. Respuestas
 
 {answers}
 
-"Mayor comprador" se mide por importe (decisión GD7 en `PROPUESTA_GOLD.md`).
+El mayor comprador se determina por importe.
 
 ## 2. KPIs globales
 
@@ -294,33 +293,30 @@ Todos los clientes del maestro, incluidos los {no_buyers} sin compra (importe 0)
 def export_csv(con, gold):
     """Exporta las tablas analíticas finales a ficheros CSV para consumo de BI/OLAP."""
     gold.mkdir(parents=True, exist_ok=True)
-    
-    # 1. Tabla final requerida por el enunciado: Sales by customer
-    cursor_cust = con.execute("""
-        SELECT customer_id, 
-               COALESCE(customer_name, '(sin nombre)') AS customer_name, 
-               country_code, 
-               orders, 
-               total_sales, 
-               revenue_share, 
-               sales_rank 
-        FROM gold_sales_by_customer 
+
+    exports = {
+        "sales_by_customer.csv": """
+        SELECT customer_id,
+               COALESCE(customer_name, '(sin nombre)') AS customer_name,
+               country_code, orders, total_sales, revenue_share, sales_rank
+        FROM gold_sales_by_customer
         ORDER BY sales_rank, customer_id
-    """)
-    cols = [d[0] for d in cursor_cust.description]
-    with (gold / "sales_by_customer.csv").open("w", encoding="utf-8", newline="") as fh:
-        writer = csv.writer(fh, lineterminator="\n")
-        writer.writerow(cols)
-        writer.writerows(cursor_cust.fetchall())
-        
-    # 2. Indicadores globales y Total Revenue
-    cursor_kpi = con.execute("SELECT * FROM gold_kpis")
-    kpi_cols = [d[0] for d in cursor_kpi.description]
-    with (gold / "kpis.csv").open("w", encoding="utf-8", newline="") as fh:
-        writer = csv.writer(fh, lineterminator="\n")
-        writer.writerow(kpi_cols)
-        writer.writerows(cursor_kpi.fetchall())
-    print(f"Datasets CSV generados en {gold}: sales_by_customer.csv, kpis.csv")
+        """,
+        "sales_by_product.csv": """
+        SELECT * FROM gold_sales_by_product ORDER BY revenue_rank, product
+        """,
+        "sales_by_country.csv": """
+        SELECT * FROM gold_sales_by_country ORDER BY revenue_rank, country_code
+        """,
+    }
+    for filename, query in exports.items():
+        cursor = con.execute(query)
+        cols = [description[0] for description in cursor.description]
+        with (gold / filename).open("w", encoding="utf-8", newline="") as fh:
+            writer = csv.writer(fh, lineterminator="\n")
+            writer.writerow(cols)
+            writer.writerows(cursor.fetchall())
+    print(f"Datasets CSV generados en {gold}: {', '.join(exports)}")
 
 
 def main(silver, gold):

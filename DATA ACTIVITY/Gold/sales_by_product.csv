@@ -1,0 +1,4 @@
+product,orders,revenue,avg_price,revenue_share,revenue_rank
+monitor,64,13190.0,206.09,0.805,1
+teclado,65,1950.0,30.0,0.119,2
+raton,62,1245.0,20.08,0.076,3

@@ -1,2 +1,2 @@
-﻿"total_revenue","total_orders","avg_order_value","total_customers","buying_customers","buyer_rate"
-"16385.00","191","85.79","248","189","0.7621"
+total_revenue,total_orders,avg_order_value,total_customers,buying_customers,buyer_rate
+16385.0,191,85.79,248,189,0.7621
